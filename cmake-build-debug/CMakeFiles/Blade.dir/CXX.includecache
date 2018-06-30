@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/PC/CLionProjects/Blade/card.h
+string
+-
+
+C:/Users/PC/CLionProjects/Blade/duel.h
+algorithm
+-
+card.h
+C:/Users/PC/CLionProjects/Blade/card.h
+ctime
+-
+iostream
+-
+stack
+-
+vector
+-
+
+C:/Users/PC/CLionProjects/Blade/main.cpp
+duel.h
+C:/Users/PC/CLionProjects/Blade/duel.h
+

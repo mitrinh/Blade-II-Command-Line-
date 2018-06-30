@@ -1,0 +1,3 @@
+C:/Users/PC/CLionProjects/Blade/cmake-build-debug/CMakeFiles/Blade.dir
+C:/Users/PC/CLionProjects/Blade/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/PC/CLionProjects/Blade/cmake-build-debug/CMakeFiles/rebuild_cache.dir
