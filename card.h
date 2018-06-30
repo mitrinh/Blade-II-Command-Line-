@@ -6,6 +6,7 @@
 #define BLADE_CARD_H
 
 #include <string>
+#include <utility>
 using namespace std;
 
 class card {
@@ -38,8 +39,7 @@ string card::getName() {
 }
 
 void card::setName(string thisName){
-    name = thisName;
+    name = std::move(thisName);
 }
-
 
 #endif //BLADE_CARD_H
