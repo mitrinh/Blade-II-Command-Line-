@@ -3,4 +3,4 @@ project(Blade)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Blade main.cpp duel.h card.h)
+add_executable(Blade main.cpp card.h hand.h field.h duel.h)

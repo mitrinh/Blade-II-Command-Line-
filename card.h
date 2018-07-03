@@ -6,40 +6,35 @@
 #define BLADE_CARD_H
 
 #include <string>
+#include <utility>
 using namespace std;
 
 class card {
 private:
-    int value;
+    unsigned int value;
     string name;
 public:
     card();
-    int getValue();
-    void setValue(int thisValue);
-    string getName();
+    ~card();
+    unsigned int getValue() const;
+    void setValue(unsigned int thisValue);
+    string getName() const;
     void setName(string thisName);
 };
 
 card::card() {
-    value = -1;
+    value = 0;
     name = "empty";
 }
 
-int card::getValue() {
-    return value;
-}
+card::~card() = default; // end destructor
 
-void card::setValue(int thisValue) {
-    value = thisValue;
-}
+unsigned int card::getValue() const { return value; }
 
-string card::getName() {
-    return name;
-}
+void card::setValue(unsigned int thisValue) { value = thisValue; }
 
-void card::setName(string thisName){
-    name = thisName;
-}
+string card::getName() const { return name; }
 
+void card::setName(string thisName){ name = std::move(thisName); }
 
 #endif //BLADE_CARD_H
