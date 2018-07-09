@@ -6,9 +6,8 @@
 
 /* generates each type of card */
 void generateCards(card cards[]) {
-    card *temp;
+    unique_ptr<card>temp(new card);
     for (unsigned int i = 0; i < CARD_TYPES; i++) {
-        temp = new card();
         // numbered cards 1-7
         if (i < 7) {
             temp->setValue(i+1);
@@ -18,24 +17,32 @@ void generateCards(card cards[]) {
         else {
             temp->setValue(1); // can be used to check if a card is numbered or special
             switch(i) {
-                case 7:
+                case 7: {
                     temp->setName("bolt");
+                    temp->setCardType(1);
                     break;
-                case 8:
+                }
+                case 8: {
                     temp->setName("mirror");
+                    temp->setCardType(2);
                     break;
-                case 9:
+                }
+                case 9: {
                     temp->setName("blast");
+                    temp->setCardType(3);
                     break;
-                case 10:
+                }
+                case 10: {
                     temp->setName("force");
+                    temp->setCardType(4);
                     break;
-                default:
+                }
+                default: {
                     cout << "An error has occurred. " << "cards cannot be generated";
+                }
             }
         }
         cards[i] = *temp;
-        delete temp;
     }
 }
 
