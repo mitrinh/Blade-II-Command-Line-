@@ -6,20 +6,32 @@
 #define BLADE_HAND_H
 
 #include "card.h"
+#include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <random>
+#include <stack>
 #include <vector>
+
+#define START_HAND_QUANTITY 10
 
 class hand {
 private:
     unsigned int regularCards;
     unsigned int specialCards;
 public:
+    vector<card> hand_;
     explicit hand();
     ~hand();
-    vector<card> hand_;
     unsigned int & getRegularCards();
     unsigned int & getSpecialCards();
     void setRegularCards(unsigned int);
     void setSpecialCards(unsigned int);
+    void createHand(stack<card>&);
+    void printHand() const;
+    void shuffleHand();
+    void sortHand();
 };
 
 hand::hand() {
@@ -33,8 +45,49 @@ unsigned int & hand::getRegularCards() { return regularCards; } // end getRegula
 
 unsigned int & hand::getSpecialCards() { return specialCards; } // end getSpecialCards
 
+// output hand
+void hand::printHand() const {for (auto &i : hand_) cout << i.getName() << " " << endl; } // end printHand
+
 void hand::setRegularCards(unsigned int regCards){ regularCards = regCards; } // end setRegularCards
 
 void hand::setSpecialCards(unsigned int specCards){ specialCards = specCards; } // end setSpecialCards
+
+// sort a hand by their value
+bool sortByValue(const card &lhs, const card &rhs) { return lhs.getValue() < rhs.getValue(); }
+
+// sort a hand by their name alphabetically
+bool sortByName(const card &lhs, const card &rhs) { return lhs.getName() < rhs.getName(); }
+
+// give 10 cards to both hands from the shared deck at start of duel
+void hand::createHand(stack<card> &deck) {
+    unique_ptr<card> temp(&deck.top());
+    for(int i = 0; i < START_HAND_QUANTITY; i++) {
+        *temp = deck.top();
+        if (isRegularCard(*temp)) setRegularCards(++getRegularCards());
+        else setSpecialCards(++getSpecialCards());
+        hand_.push_back(*temp);
+        deck.pop();
+    }
+} // end createHand
+
+// shuffle hand
+void hand::shuffleHand() {
+    long seed = static_cast<long>(chrono::system_clock::now().time_since_epoch().count());
+    shuffle(hand_.begin(),hand_.end(),default_random_engine(seed));
+}
+
+// sorts a hand by 1-7 ascending cards, then special cards alphabetically
+void hand::sortHand() {
+    unique_ptr <vector<card>> regHand(new vector<card>);
+    unique_ptr <vector<card>> specialHand(new vector<card>);
+    for (auto &i : hand_) {
+        if(isRegularCard(i))regHand->push_back(i);
+        else specialHand->push_back(i);
+    }
+    sort(regHand->begin(),regHand->end(),sortByValue);
+    sort(specialHand->begin(),specialHand->end(),sortByName);
+    regHand->insert(regHand->end(),specialHand->begin(),specialHand->end());
+    hand_.swap(*regHand);
+} // end sortHand
 
 #endif //BLADE_HAND_H
