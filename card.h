@@ -53,4 +53,7 @@ bool card::getBolted() const { return bolted; }
 
 void card::setBolted(bool bolted_) { bolted = bolted_; }
 
+// return true if regular Card, false if not and is a special card
+bool isRegularCard(const card &card_) { return (card_.getCardType() == 0); }
+
 #endif //BLADE_CARD_H
