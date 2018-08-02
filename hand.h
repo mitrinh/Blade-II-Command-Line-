@@ -46,7 +46,10 @@ unsigned int & hand::getRegularCards() { return regularCards; } // end getRegula
 unsigned int & hand::getSpecialCards() { return specialCards; } // end getSpecialCards
 
 // output hand
-void hand::printHand() const {for (auto &i : hand_) cout << i.getName() << " " << endl; } // end printHand
+void hand::printHand() const {
+    for (auto &i : hand_) cout << i.getName() << " ";
+    cout << endl;
+} // end printHand
 
 void hand::setRegularCards(unsigned int regCards){ regularCards = regCards; } // end setRegularCards
 
