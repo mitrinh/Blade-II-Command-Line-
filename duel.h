@@ -33,6 +33,7 @@ public:
     ~duel();
     void playCard(hand&, hand&, field&, field&, unsigned int);
     void printDeck();
+    void printTopFields();
 }; // end class duel
 
 // returns whether both piles are of equal value or not
@@ -58,6 +59,7 @@ duel::duel(card cards[]) {
     // sets up field by drawing until tie is gone
     initializeField();
     while(!duelEnd) {
+        // printTopFields();
         cout << "player 1: " << field1.getPile() << endl;
         cout << "player 2: " << field2.getPile() << endl;
         if(player == 1) {
@@ -98,8 +100,9 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
         switch (temp->getCardType()) {
             case 1: { // bolt, nullify a cards value/effect
                 enemyField.field_.top().setBolted(true);
+                // if enemy used force, revert it; else subtract the enemy's top card value
                 if (isForce(enemyField.field_.top())) enemyField.setPile(enemyField.getPile() / 2);
-                else enemyField.setPile(enemyField.getPile() - temp->getValue());
+                else enemyField.setPile(enemyField.getPile() - enemyField.field_.top().getValue());
                 break;
             }
             case 2: { // mirror, swaps the fields
@@ -110,8 +113,14 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
                 enemyHand.shuffleHand();
                 cout << "Pick a card from your opponent's hand from " << 1 << " to " <<
                      enemyHand.hand_.size() << " to discard." << endl;
+                // subtract that card from the card count
+                unsigned int enemyPosition = pickCard(enemyHand);
+                if(isRegularCard(enemyHand.hand_.at(enemyPosition))) {
+                    enemyHand.setRegularCards(--enemyHand.getRegularCards());
+                }
+                else enemyHand.setSpecialCards(--enemyHand.getSpecialCards());
                 // discard that card
-                enemyHand.hand_.erase(enemyHand.hand_.begin() + pickCard(enemyHand));
+                enemyHand.hand_.erase(enemyHand.hand_.begin() + enemyPosition);
                 // sort it back
                 enemyHand.sortHand();
                 break;
@@ -122,17 +131,18 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
             }
             default: { // regular card
                 // if card played is '1' and top card on field is bolted, unbolt it
-                if(temp->getValue()==1 && isBolted(field__)) {
+                if(temp->getName()=="1" && isBolted(field__)) {
                     field__.field_.top().setBolted(false);
+                    // if bolted card was force, double pile; else add the bolted card's value back to pile
                     if(isForce(field__.field_.top())) field__.setPile(field__.getPile() * 2);
                     else field__.setPile(field__.getPile() + field__.field_.top().getValue());
                 }
-                // add value when not above condition to pile
+                // add value to pile when above condition is false
                 else field__.setPile(field__.getPile() + temp->getValue());
                 break;
             }
         }
-        // subtract count of card from hand
+        // checks if card is regular or special and subtract from that count.
         if(isRegularCard(*temp)) hand__.setRegularCards(--hand__.getRegularCards());
         else hand__.setSpecialCards(--hand__.getSpecialCards());
         // discard card used from hand
@@ -239,5 +249,15 @@ void duel::printDeck() {
         deck.pop();
     }
 } // end printDeck
+
+// output both fields top card
+void duel::printTopFields() {
+    cout << "Field 1 top card: ";
+    cout << field1.field_.top().getName() << " ";
+    cout << endl;
+    cout << "Field 2 top card: ";
+    cout << field2.field_.top().getName() << " ";
+    cout << endl;
+} // end printTopFields
 
 #endif //BLADE_DUEL_H
