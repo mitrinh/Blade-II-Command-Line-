@@ -44,11 +44,39 @@ void generateCards(card cards[]) {
         }
         cards[i] = *temp;
     }
-}
+} // end generateCards
 
+// prompts the user to answer the yes or no question
+char askYesOrNo(){
+    char answer = 'a';
+    while(answer != 'y' && answer != 'n') {
+        cin >> answer;
+        if(answer != 'y' && answer != 'n') cout << "Type y or n." << endl;
+    }
+    cout << "Choice selected: " << answer << endl;
+    return answer;
+} // end askYesOrNo
+
+// main
 int main() {
+    char answer;
     card cards[CARD_TYPES];
     generateCards(cards);
-    duel d(cards);
+    cout << "Do you want to duel? y for yes, n for no" << endl;
+    answer = askYesOrNo();
+    if(answer == 'y') {
+        duel d(cards);
+        while(answer == 'y'){
+            cout << "rematch? y for yes, n for no" << endl;
+            answer = askYesOrNo();
+            if(answer == 'y') {
+                duel e(cards);
+                cout << "duel has ended." << endl;
+            }
+        }
+        cout << "Goodbye!" << endl;
+        return 0;
+    }
+    cout << "Goodbye!" << endl;
     return 0;
-}
+} // end main
