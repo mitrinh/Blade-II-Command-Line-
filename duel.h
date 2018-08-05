@@ -26,6 +26,7 @@ private:
     void checkEnd();
     void createDeck(const card[]);
     void initializeField();
+    void initializeHands();
     void resetField();
     unsigned int pickCard(hand&); // returns the chosen position of the card from a player's hand
 public:
@@ -45,17 +46,13 @@ bool isBolted(const field &field__) { return (field__.field_.top().getBolted());
 // checks if a card is force
 bool isForce(const card &card_) { return card_.getCardType() == 4; }
 
+// constructor
 duel::duel(card cards[]) {
     player = 1;
     duelEnd = false;
     while(!deck.empty()) deck.pop();
     createDeck(cards);
-    hand1.createHand(deck);
-    hand2.createHand(deck);
-    hand1.sortHand();
-    hand2.sortHand();
-    hand1.printHand();
-    hand2.printHand();
+    initializeHands();
     // sets up field by drawing until tie is gone
     initializeField();
     while(!duelEnd) {
@@ -79,7 +76,7 @@ duel::duel(card cards[]) {
                 duelEnd = true;
                 break;
             }
-            resetField();
+            initializeField();
         }
     }
     checkEnd();
@@ -207,7 +204,7 @@ void duel::initializeField() {
         // checks if deck empty, then tie
         if(deck.empty()) {
             duelEnd = true;
-            break;
+            return;
         }
         field1.field_.push(deck.top());
         deck.pop();
@@ -216,30 +213,26 @@ void duel::initializeField() {
         deck.pop();
         field2.setPile(field2.getPile()+field2.field_.top().getValue());
         // if piles are of equal value then reset field and draw again
-        if(equalValue()) {
-            field1.setPile(0);
-            field2.setPile(0);
-            while(!field1.field_.empty()) field1.field_.pop();
-            while(!field2.field_.empty()) field2.field_.pop();
-        }
+        if(equalValue()) { resetField(); }
         // else, player 1 goes first if pile is less than player 2, else player 2's turn
         else player = (field1.getPile() < field2.getPile()) ? 1 : 2;
     }
 } // end initializeField
 
+// fills both hands with 10 cards and sorts them
+void duel::initializeHands() {
+    hand1.createHand(deck);
+    hand2.createHand(deck);
+    hand1.sortHand();
+    hand2.sortHand();
+} // end initializeHands
+
 // resets both sides of field if piles are equal value
 void duel::resetField(){
-    field1.setPile(0);
-    field2.setPile(0);
-    while(!field1.field_.empty()) field1.field_.pop();
-    while(!field2.field_.empty()) field2.field_.pop();
-    field1.field_.push(deck.top());
-    deck.pop();
-    field1.setPile(field1.getPile()+field1.field_.top().getValue());
-    field2.field_.push(deck.top());
-    deck.pop();
-    field2.setPile(field2.getPile()+field2.field_.top().getValue());
-    player = (field1.getPile() < field2.getPile()) ? 1 : 2;
+    field1.resetPile();
+    field2.resetPile();
+    field1.clearField();
+    field2.clearField();
 }
 
 // output a deck
