@@ -7,6 +7,8 @@
 
 #include "field.h"
 #include "hand.h"
+#include <cstdlib>
+#include <cctype>
 
 #define CARD_TYPES 11 // 11 card types: 1-7, bolt, mirror, blast, force
 #define CARD_QUANTITY_MAX 4
@@ -26,6 +28,7 @@ private:
     void checkEnd();
     void createDeck(const card[]);
     void initializeField();
+    void initializeField_();
     void initializeHands();
     void resetField();
     unsigned int pickCard(hand&); // returns the chosen position of the card from a player's hand
@@ -46,6 +49,12 @@ bool isBolted(const field &field__) { return (field__.field_.top().getBolted());
 // checks if a card is force
 bool isForce(const card &card_) { return card_.getCardType() == 4; }
 
+// check if a string is a number
+bool is_number(const std::string& s)
+{
+    return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
 // constructor
 duel::duel(card cards[]) {
     player = 1;
@@ -55,6 +64,8 @@ duel::duel(card cards[]) {
     initializeHands();
     // sets up field by drawing until tie is gone
     initializeField();
+    // player 1 goes first if pile is less than player 2, else player 2's turn
+    player = (field1.getPile() < field2.getPile()) ? 1 : 2;
     while(!duelEnd) {
         // printTopFields();
         cout << "player 1: " << field1.getPile() << endl;
@@ -63,20 +74,22 @@ duel::duel(card cards[]) {
             cout << "\tplayer " << player << "'s turn.\n" << "Play a card" << endl;
             hand1.printHand();
             playCard(hand1,hand2,field1,field2,pickCard(hand1));
+            // check if lost
+            if (field2.getPile() > field1.getPile()) duelEnd = true;
             player = 2;
         }
         else {
             cout << "\tplayer " << player << "'s turn.\n" << "Play a card" << endl;
             hand2.printHand();
             playCard(hand2,hand1,field2,field1,pickCard(hand2));
+            // check if lost
+            if (field1.getPile() > field2.getPile()) duelEnd = true;
             player = 1;
         }
-        while (equalValue()) {
-            if(deck.empty()) {
-                duelEnd = true;
-                break;
-            }
+        if (equalValue()) {
+            resetField();
             initializeField();
+            player = (field1.getPile() < field2.getPile()) ? 1 : 2;
         }
     }
     checkEnd();
@@ -85,12 +98,13 @@ duel::duel(card cards[]) {
 duel::~duel() = default; // end destructor
 
 // play a card from the respective player's hand
-void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyField, const unsigned int position) {
+void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyField, unsigned int position) {
     // check if you only have special cards in hand
     if(hand__.getSpecialCards() == 0) duelEnd = true;
     else {
         // create pointer to card that is played
         unique_ptr<card> temp(&hand__.hand_.at(position));
+        cout << temp->getName() << endl;
         // put the card on the field if it has a value > 2 or if it is a '1' card and pile isn't bolted is or if it is force
         if( (temp->getValue() > 2 || (temp->getName()=="1" && !isBolted(field__)))
             || (isForce(*temp))) field__.field_.push(*temp);
@@ -142,26 +156,28 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
         // checks if card is regular or special and subtract from that count.
         if(isRegularCard(*temp)) hand__.setRegularCards(--hand__.getRegularCards());
         else hand__.setSpecialCards(--hand__.getSpecialCards());
-        // discard card used from hand
-        hand__.hand_.erase(hand__.hand_.begin() + position);
-        // if blast was played, play another card
+        // if blast was played, play another card and discard blast
         if(temp->getCardType() == 3) {
+            hand__.setSpecialCards(--hand__.getSpecialCards());
+            hand__.hand_.erase(hand__.hand_.begin() + position);
             cout << "Now play another card player " << player << "." << endl;
             hand__.printHand();
             playCard(hand__,enemyHand,field__,enemyField,pickCard(hand__));
         }
-        // check if lost
-        if (enemyField.getPile() > field__.getPile()) duelEnd = true;
+        // else discard card used from hand
+        else hand__.hand_.erase(hand__.hand_.begin() + position);
     }
 } // end playCard
 
 // returns the chosen position of the card from a player's hand
 unsigned int duel::pickCard(hand& hand__) {
+    string temp;
     unsigned int position = 0;
     cout << "Pick a card between " << 1 << " and " << hand__.hand_.size() << " ." << endl;
     // repeats if position is out of bounds
     while (!((1 <= position) && (position <= hand__.hand_.size()))) {
-        cin >> position;
+        cin >> temp;
+        if (is_number(temp)) position = static_cast<unsigned int>(stoi(temp));
         if (!((1 <= position) && (position <= hand__.hand_.size()))) {
             cout << "card must be between " << 1 << " and " << hand__.hand_.size() << " ." << endl;
         }
@@ -200,22 +216,28 @@ void duel::createDeck(const card cards[]) {
 // puts the top card from each deck onto their field
 // decks drawn at same rate, so if both decks are empty, then tie
 void duel::initializeField() {
-    while(equalValue()){
-        // checks if deck empty, then tie
-        if(deck.empty()) {
-            duelEnd = true;
-            return;
-        }
-        field1.field_.push(deck.top());
-        deck.pop();
-        field1.setPile(field1.getPile()+field1.field_.top().getValue());
-        field2.field_.push(deck.top());
-        deck.pop();
-        field2.setPile(field2.getPile()+field2.field_.top().getValue());
-        // if piles are of equal value then reset field and draw again
-        if(equalValue()) { resetField(); }
-        // else, player 1 goes first if pile is less than player 2, else player 2's turn
-        else player = (field1.getPile() < field2.getPile()) ? 1 : 2;
+    initializeField_();
+    player = (field1.getPile() < field2.getPile()) ? 1 : 2;
+}
+
+// helper to initializeField(), used for recursion
+void duel::initializeField_() {
+    // checks if deck empty, then tie
+    if(deck.empty()) {
+        duelEnd = true;
+        return;
+    }
+    // puts a card from each deck onto the field
+    field1.field_.push(deck.top());
+    deck.pop();
+    field1.setPile(field1.getPile()+field1.field_.top().getValue());
+    field2.field_.push(deck.top());
+    deck.pop();
+    field2.setPile(field2.getPile()+field2.field_.top().getValue());
+    // if piles are of equal value then reset field and draw again
+    if(equalValue()) {
+        resetField();
+        initializeField_();
     }
 } // end initializeField
 
