@@ -27,6 +27,7 @@ private:
     hand hand2;
     void checkEnd();
     void createDeck(const card[]);
+    void discardCard(unsigned int, hand&);
     void initializeField();
     void initializeField_();
     void initializeHands();
@@ -37,6 +38,7 @@ public:
     ~duel();
     void playCard(hand&, hand&, field&, field&, unsigned int);
     void printDeck();
+    void printScore();
     void printTopFields();
 }; // end class duel
 
@@ -50,8 +52,7 @@ bool isBolted(const field &field__) { return (field__.field_.top().getBolted());
 bool isForce(const card &card_) { return card_.getCardType() == 4; }
 
 // check if a string is a number
-bool is_number(const std::string& s)
-{
+bool is_number(const std::string& s) {
     return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
@@ -67,20 +68,14 @@ duel::duel(card cards[]) {
     // player 1 goes first if pile is less than player 2, else player 2's turn
     player = (field1.getPile() < field2.getPile()) ? 1 : 2;
     while(!duelEnd) {
-        // printTopFields();
-        cout << "player 1: " << field1.getPile() << endl;
-        cout << "player 2: " << field2.getPile() << endl;
+        cout << "player " << player << "'s turn." << endl;
         if(player == 1) {
-            cout << "\tplayer " << player << "'s turn.\n" << "Play a card" << endl;
-            hand1.printHand();
             playCard(hand1,hand2,field1,field2,pickCard(hand1));
             // check if lost
             if (field2.getPile() > field1.getPile()) duelEnd = true;
             player = 2;
         }
         else {
-            cout << "\tplayer " << player << "'s turn.\n" << "Play a card" << endl;
-            hand2.printHand();
             playCard(hand2,hand1,field2,field1,pickCard(hand2));
             // check if lost
             if (field1.getPile() > field2.getPile()) duelEnd = true;
@@ -124,14 +119,9 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
                 enemyHand.shuffleHand();
                 cout << "Pick a card from your opponent's hand from " << 1 << " to " <<
                      enemyHand.hand_.size() << " to discard." << endl;
-                // subtract that card from the card count
+                // discard a card from the enemy's Hand
                 unsigned int enemyPosition = pickCard(enemyHand);
-                if(isRegularCard(enemyHand.hand_.at(enemyPosition))) {
-                    enemyHand.setRegularCards(--enemyHand.getRegularCards());
-                }
-                else enemyHand.setSpecialCards(--enemyHand.getSpecialCards());
-                // discard that card
-                enemyHand.hand_.erase(enemyHand.hand_.begin() + enemyPosition);
+                discardCard(enemyPosition,enemyHand);
                 // sort it back
                 enemyHand.sortHand();
                 break;
@@ -153,24 +143,25 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
                 break;
             }
         }
-        // checks if card is regular or special and subtract from that count.
-        if(isRegularCard(*temp)) hand__.setRegularCards(--hand__.getRegularCards());
-        else hand__.setSpecialCards(--hand__.getSpecialCards());
-        // if blast was played, play another card and discard blast
+        // if blast was played, discard blast and play another card
         if(temp->getCardType() == 3) {
-            hand__.setSpecialCards(--hand__.getSpecialCards());
-            hand__.hand_.erase(hand__.hand_.begin() + position);
+            discardCard(position,hand__);
             cout << "Now play another card player " << player << "." << endl;
             hand__.printHand();
             playCard(hand__,enemyHand,field__,enemyField,pickCard(hand__));
         }
         // else discard card used from hand
-        else hand__.hand_.erase(hand__.hand_.begin() + position);
+        else discardCard(position,hand__);
     }
 } // end playCard
 
 // returns the chosen position of the card from a player's hand
 unsigned int duel::pickCard(hand& hand__) {
+    // list score of each player
+    printScore();
+    cout << "Play a card: ";
+    // list the player's hand
+    hand__.printHand();
     string temp;
     unsigned int position = 0;
     cout << "Pick a card between " << 1 << " and " << hand__.hand_.size() << " ." << endl;
@@ -188,8 +179,7 @@ unsigned int duel::pickCard(hand& hand__) {
 
 // check if a player 1 won, player 2 won, or tied
 void duel::checkEnd() {
-    cout << "player 1: " << field1.getPile() << endl;
-    cout << "player 2: " << field2.getPile() << endl;
+    printScore();
     if(field1.getPile() > field2.getPile()) cout << "Player 1 wins!" << endl;
     else if(field2.getPile() > field1.getPile()) cout << "Player 2 wins!" << endl;
     else cout << "Tie!" << endl;
@@ -211,7 +201,14 @@ void duel::createDeck(const card cards[]) {
     for(unsigned int i = 0; i < totalCards; i++) {
         deck.push(temp.at(i));
     }
-} // end duel
+} // end createDeck
+
+// discards the card at the position from a hand and subtract that from card type count
+void duel::discardCard(unsigned int position, hand& hand__) {
+    if (isRegularCard(hand__.hand_.at(position))) hand__.setRegularCards(hand__.getRegularCards()-1);
+    else hand__.setSpecialCards(hand__.getSpecialCards()-1);
+    hand__.hand_.erase(hand__.hand_.begin() + position);
+} // end discardCard
 
 // puts the top card from each deck onto their field
 // decks drawn at same rate, so if both decks are empty, then tie
@@ -264,6 +261,11 @@ void duel::printDeck() {
         deck.pop();
     }
 } // end printDeck
+
+// output the score
+void duel::printScore() {
+    cout << "player 1: " << field1.getPile() << '\t' << "player 2: " << field2.getPile() << endl;
+} // end printScore
 
 // output both fields top card
 void duel::printTopFields() {

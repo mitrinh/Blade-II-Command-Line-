@@ -24,8 +24,8 @@ public:
     vector<card> hand_;
     explicit hand();
     ~hand();
-    unsigned int & getRegularCards();
-    unsigned int & getSpecialCards();
+    unsigned int getRegularCards() const;
+    unsigned int getSpecialCards() const;
     void setRegularCards(unsigned int);
     void setSpecialCards(unsigned int);
     void createHand(stack<card>&);
@@ -41,12 +41,14 @@ hand::hand() {
 
 hand::~hand() = default; // end destructor
 
-unsigned int & hand::getRegularCards() { return regularCards; } // end getRegularCards
+unsigned int hand::getRegularCards() const { return regularCards; } // end getRegularCards
 
-unsigned int & hand::getSpecialCards() { return specialCards; } // end getSpecialCards
+unsigned int hand::getSpecialCards() const { return specialCards; } // end getSpecialCards
 
 // output hand
 void hand::printHand() const {
+    cout << "Regular Cards: " << getRegularCards() << '\t';
+    cout << "Special Cards: " << getSpecialCards() << endl;
     for (auto &i : hand_) cout << i.getName() << " ";
     cout << endl;
 } // end printHand
@@ -66,8 +68,8 @@ void hand::createHand(stack<card> &deck) {
     unique_ptr<card> temp(&deck.top());
     for(int i = 0; i < START_HAND_QUANTITY; i++) {
         *temp = deck.top();
-        if (isRegularCard(*temp)) setRegularCards(++getRegularCards());
-        else setSpecialCards(++getSpecialCards());
+        if (isRegularCard(*temp)) setRegularCards(1+getRegularCards());
+        else setSpecialCards(1+getSpecialCards());
         hand_.push_back(*temp);
         deck.pop();
     }

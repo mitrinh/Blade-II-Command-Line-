@@ -31,7 +31,11 @@ unsigned int & field::getPile() { return pile; } // end getPile
 
 void field::setPile(unsigned int amount){ pile = amount; } // end setPile
 
-void field::clearField() { while(!field_.empty()) field_.pop(); } // end clearField
+// gets rid of each card on field, if a card is bolted; unbolt it.
+void field::clearField() {
+    if(field_.top().getBolted()) field_.top().setBolted(false);
+    while(!field_.empty()) field_.pop();
+} // end clearField
 
 void field::resetPile() { pile = 0; } // end resetPile
 
