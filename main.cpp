@@ -72,6 +72,7 @@ int main() {
             if(answer.at(0) == 'y') {
                 duel e(cards);
                 cout << "duel has ended." << endl;
+                answer = "abc";
             }
         }
         cout << "Goodbye!" << endl;
