@@ -13,16 +13,11 @@ bool init();
 bool loadMedia();
 void close();
 
-// array of windows to have multiple windows
-LWindow windows[TOTAL_WINDOWS];
-// array of buttons
-LButton buttons[TOTAL_BUTTONS];
-
 bool init() {
     //Initialization flag
     bool success = true;
     //Initialize SDL
-    if(SDL_Init( SDL_INIT_VIDEO ) < 0) {
+    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_Error_Logger("initialize SDL");
         success = false;
     }
@@ -30,8 +25,8 @@ bool init() {
         //Set texture filtering to linear
         if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"1")) SDL_Log("Warning: Linear texture filtering not enabled!");
         //Create first window
-        if( !windows[0].init() ) {
-            SDL_Log( "Window 0 could not be created!\n" );
+        if(!windows[0].init()) {
+            SDL_Log("Window 0 could not be created!\n");
             success = false;
         }
     }
@@ -49,17 +44,17 @@ bool loadMedia() {
     else {
         //Set sprites
         for( int i = 0; i < BUTTON_SPRITE_TOTAL; ++i ) {
-            spriteClips[ i ].x = 0;
-            spriteClips[ i ].y = i * BUTTON_HEIGHT;
-            spriteClips[ i ].w = BUTTON_WIDTH;
-            spriteClips[ i ].h = BUTTON_HEIGHT;
+            spriteClips[i].x = 0;
+            spriteClips[i].y = i * BUTTON_HEIGHT;
+            spriteClips[i].w = BUTTON_WIDTH;
+            spriteClips[i].h = BUTTON_HEIGHT;
         }
         // title
-        buttons[ 0 ].setPosition(0,0);
+        buttons[0].setPosition(0,0);
         // play
-        buttons[ 1 ].setPosition(SCREEN_WIDTH-BUTTON_WIDTH, SCREEN_HEIGHT-BUTTON_HEIGHT-300);
+        buttons[1].setPosition(SCREEN_WIDTH-BUTTON_WIDTH, SCREEN_HEIGHT-BUTTON_HEIGHT-300);
         // quit
-        buttons[ 2 ].setPosition(SCREEN_WIDTH-BUTTON_WIDTH, SCREEN_HEIGHT-BUTTON_HEIGHT-100);
+        buttons[2].setPosition(SCREEN_WIDTH-BUTTON_WIDTH, SCREEN_HEIGHT-BUTTON_HEIGHT-100);
     }
     return success;
 }

@@ -27,6 +27,7 @@ int main( int argc, char* args[] ) {
             bool startDuel = false;
             //Update all windows
             for (auto &window : windows) window.render();
+            windows[0].focus();
             // create main menu
             while (!quit) {
                 //e is an SDL_Event variable we've declared before entering the main loop

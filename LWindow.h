@@ -16,12 +16,6 @@ const int SCREEN_HEIGHT = 480;
 //Total windows
 const int TOTAL_WINDOWS = 2;
 
-//main menu window
-SDL_Window* window;
-//renderer
-SDL_Renderer* renderer;
-
-
 class LWindow{
 private:
 //Window dimensions
@@ -34,6 +28,10 @@ private:
     bool shown;
     int windowID;
 public:
+//main menu window
+    SDL_Window* window;
+//renderer
+    SDL_Renderer* renderer;
 //constructor
     LWindow();
 //destructor
@@ -56,6 +54,9 @@ public:
     bool isMinimized();
     bool isShown();
 };
+
+// array of windows to have multiple windows
+LWindow windows[TOTAL_WINDOWS];
 
 // constructor
 LWindow::LWindow() {
@@ -177,8 +178,7 @@ void LWindow::focus() {
 }
 
 // render window
-void LWindow::render()
-{
+void LWindow::render() {
     //Clear screen
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
