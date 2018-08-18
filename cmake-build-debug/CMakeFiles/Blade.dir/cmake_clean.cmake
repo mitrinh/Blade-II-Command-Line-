@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Blade.dir/main.cpp.obj"
+  "CMakeFiles/Blade.dir/src/main.cpp.obj"
   "Blade.pdb"
   "Blade.exe"
   "Blade.exe.manifest"
