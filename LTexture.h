@@ -13,7 +13,7 @@
 SDL_Surface* loadedSurface = nullptr;
 
 //Texture wrapper class
-class LTexture {
+class LTexture : public LWindow {
 private:
     //The actual hardware texture
     SDL_Texture* mTexture;
@@ -28,7 +28,7 @@ public:
     //Loads image at specified path
     bool loadFromFile(const string &);
     //Deallocates texture
-    void free();
+    void texFree();
     //Set color modulation
     void setColor( Uint8 red, Uint8 green, Uint8 blue );
     //Set blending
@@ -39,8 +39,8 @@ public:
     void render( int x, int y, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr,
             SDL_RendererFlip flip = SDL_FLIP_NONE );
     //Gets image dimensions
-    int getWidth();
-    int getHeight();
+    int getTexWidth();
+    int getTexHeight();
 };
 
 LTexture::LTexture() {
@@ -59,13 +59,13 @@ bool LTexture::loadFromFile(const string &path) {
     //The final texture
     SDL_Texture* newTexture = nullptr;
     //Load image at specified path
-    loadedSurface = IMG_Load( path.c_str() );
+    loadedSurface = IMG_Load(path.c_str());
     if( loadedSurface == nullptr) SDL_Error_Logger("IMG_Load");
     else {
         //Color key image
         SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
         //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        newTexture = SDL_CreateTextureFromSurface(windows->renderer, loadedSurface);
         if(newTexture == nullptr) SDL_Log("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         else {
             //Get image dimensions
@@ -80,7 +80,7 @@ bool LTexture::loadFromFile(const string &path) {
     return mTexture != nullptr;
 }
 
-void LTexture::free() {
+void LTexture::texFree() {
     //Free texture if it exists
     if( mTexture != nullptr) {
         SDL_DestroyTexture( mTexture );
@@ -110,11 +110,11 @@ void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* ce
         renderQuad.h = clip->h;
     }
     //Render to screen
-    SDL_RenderCopyEx(renderer, mTexture, clip, &renderQuad, angle, center, flip);
+    SDL_RenderCopyEx(windows->renderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
 
-int LTexture::getWidth() { return mWidth; }
+int LTexture::getTexWidth() { return mWidth; }
 
-int LTexture::getHeight() { return mHeight; }
+int LTexture::getTexHeight() { return mHeight; }
 
 #endif //BLADE_LTEXTURE_H
