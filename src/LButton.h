@@ -17,12 +17,6 @@ enum LButtonSprite {
     BUTTON_SPRITE_TOTAL = 3
 };
 
-//Mouse button sprites
-SDL_Rect spriteClips[BUTTON_SPRITE_TOTAL];
-
-// buttonSpriteSheetTexture
-LTexture buttonSpriteSheetTexture;
-
 //The mouse button
 class LButton {
 public:
@@ -42,6 +36,12 @@ private:
     //Currently used global sprite
     LButtonSprite mCurrentSprite;
 };
+
+//Mouse button sprites
+SDL_Rect spriteClips[BUTTON_SPRITE_TOTAL];
+
+// buttonSpriteSheetTexture
+LTexture buttonSpriteSheetTexture;
 
 // array of buttons
 LButton buttons[TOTAL_BUTTONS];
@@ -94,6 +94,7 @@ void LButton::handleEvent( SDL_Event* e, int index, bool &quit, bool &startDuel)
         // Play button
         if(index == 1 && inside() && e->type == SDL_MOUSEBUTTONDOWN){
             startDuel = true;
+            quit = true;
         }
         // quit button
         if(index == 2 && inside() && e->type == SDL_MOUSEBUTTONDOWN) quit = true;
