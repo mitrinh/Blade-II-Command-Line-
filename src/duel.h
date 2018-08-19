@@ -13,6 +13,9 @@
 #define CARD_TYPES 11 // 11 card types: 1-7, bolt, mirror, blast, force
 #define CARD_QUANTITY_MAX 4
 
+const int DECK_WIDTH = 100;
+const int DECK_HEIGHT = 150;
+
 
 class duel {
 private:
@@ -40,6 +43,9 @@ public:
     void printDeck();
     void printScore();
     void printTopFields();
+    bool init();
+    bool loadDuel();
+    void close();
 }; // end class duel
 
 // returns whether both piles are of equal value or not
@@ -53,44 +59,88 @@ bool isForce(const card &card_) { return card_.getCardType() == 4; }
 
 // check if a string is a number
 bool is_number(const std::string& s) {
-    return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+    return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !isdigit(c); }) == s.end();
 }
 
 // constructor
 duel::duel(card cards[]) {
-    player = 1;
-    duelEnd = false;
-    while(!deck.empty()) deck.pop();
-    createDeck(cards);
-    initializeHands();
-    // sets up field by drawing until tie is gone
-    initializeField();
-    // player 1 goes first if pile is less than player 2, else player 2's turn
-    player = (field1.getPile() < field2.getPile()) ? 1 : 2;
-    while(!duelEnd) {
-        cout << "player " << player << "'s turn." << endl;
-        if(player == 1) {
-            playCard(hand1,hand2,field1,field2,pickCard(hand1));
-            // check if lost
-            if (field2.getPile() > field1.getPile()) duelEnd = true;
-            player = 2;
-        }
-        else {
-            playCard(hand2,hand1,field2,field1,pickCard(hand2));
-            // check if lost
-            if (field1.getPile() > field2.getPile()) duelEnd = true;
-            player = 1;
-        }
-        if (equalValue()) {
-            resetField();
-            initializeField();
-            player = (field1.getPile() < field2.getPile()) ? 1 : 2;
-        }
-    }
-    checkEnd();
+    init();
+    loadDuel();
+//    player = 1;
+//    duelEnd = false;
+//    while(!deck.empty()) deck.pop();
+//    createDeck(cards);
+//    initializeHands();
+//    // sets up field by drawing until tie is gone
+//    initializeField();
+//    // player 1 goes first if pile is less than player 2, else player 2's turn
+//    player = (field1.getPile() < field2.getPile()) ? 1 : 2;
+//    while(!duelEnd) {
+//        cout << "player " << player << "'s turn." << endl;
+//        if(player == 1) {
+//            playCard(hand1,hand2,field1,field2,pickCard(hand1));
+//            // check if lost
+//            if (field2.getPile() > field1.getPile()) duelEnd = true;
+//            player = 2;
+//        }
+//        else {
+//            playCard(hand2,hand1,field2,field1,pickCard(hand2));
+//            // check if lost
+//            if (field1.getPile() > field2.getPile()) duelEnd = true;
+//            player = 1;
+//        }
+//        if (equalValue()) {
+//            resetField();
+//            initializeField();
+//            player = (field1.getPile() < field2.getPile()) ? 1 : 2;
+//        }
+//    }
+//    checkEnd();
 } // end constructor
 
 duel::~duel() = default; // end destructor
+
+// initialize duel window
+bool duel::init() {
+    // success flag
+    bool success = true;
+    //Create duel window
+    if(!windows[1].init()) {
+        SDL_Log("Window 0 could not be created!\n");
+        success = false;
+    }
+    windows[1].focus();
+    return success;
+}
+
+// load the duel layout
+bool duel::loadDuel() {
+    //Loading success flag
+    bool success = true;
+    //Load sprites
+    if(!cardSpriteSheetTexture.loadFromFile("images/card.png")) {
+        SDL_Error_Logger("Load cards from file");
+        success = false;
+    }
+    else {
+        //Set sprites that are cut off
+        for(int i = 0; i < CARD_SPRITE_TOTAL; ++i) {
+            cardSpriteClips[i].x = 0;
+            cardSpriteClips[i].y = i*CARD_HEIGHT;
+            cardSpriteClips[i].w = CARD_WIDTH;
+            cardSpriteClips[i].h = CARD_HEIGHT;
+        }
+    }
+    return success;
+}
+
+// free all resources in duel
+void duel::close() {
+    // free card images
+    cardSpriteSheetTexture.free();
+    // destroy duel window
+    windows[1].free();
+}
 
 // play a card from the respective player's hand
 void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyField, unsigned int position) {

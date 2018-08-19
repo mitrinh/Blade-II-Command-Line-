@@ -19,6 +19,13 @@ enum LButtonSprite {
 
 //The mouse button
 class LButton {
+private:
+    //checks if mouse is inside button
+    bool inside();
+    //Top left position
+    SDL_Point mPosition{};
+    //Currently used global sprite
+    LButtonSprite mCurrentSprite;
 public:
     //Initializes internal variables
     LButton();
@@ -28,16 +35,9 @@ public:
     void handleEvent( SDL_Event*, int, bool&, bool&);
     //Shows button sprite
     void render();
-private:
-    //checks if mouse is inside button
-    bool inside();
-    //Top left position
-    SDL_Point mPosition{};
-    //Currently used global sprite
-    LButtonSprite mCurrentSprite;
 };
 
-//Mouse button sprites
+//main menu sprites
 SDL_Rect spriteClips[BUTTON_SPRITE_TOTAL];
 
 // buttonSpriteSheetTexture
@@ -60,18 +60,17 @@ void LButton::setPosition( int x, int y ) {
 bool LButton::inside() {
 //Get mouse position
     int x, y;
-    SDL_GetMouseState( &x, &y );
-
+    SDL_GetMouseState(&x, &y);
 //Check if mouse is in button
     bool inside = true;
 //Mouse is left of the button
-    if( x < mPosition.x )inside = false;
+    if(x < mPosition.x )inside = false;
 //Mouse is right of the button
-    else if( x > mPosition.x + BUTTON_WIDTH ) inside = false;
+    else if(x > mPosition.x + BUTTON_WIDTH) inside = false;
 //Mouse above the button
-    else if( y < mPosition.y ) inside = false;
+    else if(y < mPosition.y) inside = false;
 //Mouse below the button
-    else if( y > mPosition.y + BUTTON_HEIGHT ) inside = false;
+    else if(y > mPosition.y + BUTTON_HEIGHT) inside = false;
     return inside;
 }
 
@@ -90,11 +89,10 @@ void LButton::handleEvent( SDL_Event* e, int index, bool &quit, bool &startDuel)
         default:break;
     }
     //If mouse event happened
-    if( e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN) {
+    if(e->type == SDL_MOUSEBUTTONDOWN) {
         // Play button
         if(index == 1 && inside() && e->type == SDL_MOUSEBUTTONDOWN){
             startDuel = true;
-            quit = true;
         }
         // quit button
         if(index == 2 && inside() && e->type == SDL_MOUSEBUTTONDOWN) quit = true;
@@ -102,7 +100,6 @@ void LButton::handleEvent( SDL_Event* e, int index, bool &quit, bool &startDuel)
 }
 
 //Show current button sprite
-void LButton::render() { buttonSpriteSheetTexture.render( mPosition.x, mPosition.y, &spriteClips[ mCurrentSprite ] );
-}
+void LButton::render() { buttonSpriteSheetTexture.render( mPosition.x, mPosition.y, &spriteClips[mCurrentSprite]); }
 
 #endif //BLADE_LBUTTON_H

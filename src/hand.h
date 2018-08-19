@@ -32,6 +32,8 @@ public:
     void printHand() const;
     void shuffleHand();
     void sortHand();
+    void setTop();
+    void setBot();
 };
 
 hand::hand() {
@@ -95,4 +97,25 @@ void hand::sortHand() {
     hand_.swap(*regHand);
 } // end sortHand
 
+// top side of hand
+void hand::setTop() {
+    //use an offset to determine card position in hand
+    unsigned int cardOffset = 0;
+    //set position for each card in hand
+    for(unsigned int i = 0; i < TOTAL_CARDS/2; i++) {
+        hand_.at(i).setPosition(20+cardOffset,20+cardOffset);
+        cardOffset+=CARD_WIDTH+10;
+    }
+}
+
+// bot side of hand
+void hand::setBot() {
+    //use an offset to determine card position in hand
+    unsigned int cardOffset = 0;
+    //set position for each card in hand
+    for(unsigned int i = 0; i < TOTAL_CARDS/2; i++) {
+        hand_.at(i).setPosition(SCREEN_WIDTH+20+cardOffset,SCREEN_HEIGHT-20+cardOffset);
+        cardOffset+=CARD_WIDTH+10;
+    }
+}
 #endif //BLADE_HAND_H

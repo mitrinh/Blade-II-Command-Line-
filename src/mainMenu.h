@@ -5,6 +5,7 @@
 #ifndef BLADE_MAINMENU_H
 #define BLADE_MAINMENU_H
 
+#include "card.h"
 #include "LButton.h"
 #include "LWindow.h"
 
@@ -23,10 +24,10 @@ bool init() {
     }
     else {
         //Set texture filtering to linear
-        if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"1")) SDL_Log("Warning: Linear texture filtering not enabled!");
+        if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"1")) SDL_Error_Logger("Linear texture filtering");
         //Create first window
         if(!windows[0].init()) {
-            SDL_Log("Window 0 could not be created!\n");
+            SDL_Error_Logger("Window 0 create");
             success = false;
         }
     }
@@ -37,13 +38,13 @@ bool loadMedia() {
     //Loading success flag
     bool success = true;
     //Load sprites
-    if( !buttonSpriteSheetTexture.loadFromFile("images/button.png")) {
+    if(!buttonSpriteSheetTexture.loadFromFile("images/button.png")) {
         SDL_Error_Logger("Load from file");
         success = false;
     }
     else {
         //Set sprites
-        for( int i = 0; i < BUTTON_SPRITE_TOTAL; ++i ) {
+        for(int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
             spriteClips[i].x = 0;
             spriteClips[i].y = i * BUTTON_HEIGHT;
             spriteClips[i].w = BUTTON_WIDTH;

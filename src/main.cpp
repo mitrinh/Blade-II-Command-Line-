@@ -15,6 +15,8 @@ void generateCards(card cards[]);
 string askYesOrNo();
 
 int main( int argc, char* args[] ) {
+    card cards[CARD_TYPES];
+    generateCards(cards);
     //Start up SDL and create window
     if(!init()) SDL_Error_Logger("initialize SDL");
     else {
@@ -25,8 +27,8 @@ int main( int argc, char* args[] ) {
             SDL_Event e;
             bool quit = false;
             bool startDuel = false;
-            //Update all windows
-            for (auto &window : windows) window.render();
+            //Update main menu window
+            windows[0].render();
             windows[0].focus();
             // create main menu
             while (!quit) {
@@ -52,17 +54,22 @@ int main( int argc, char* args[] ) {
                     }
                     //Render buttons
                     for (auto &button : buttons) button.render();
-                    //Check all windows
-                    bool allWindowsClosed = true;
-                    for (auto &window : windows) {
-                        if(window.isShown() ) {
-                            allWindowsClosed = false;
-                            break;
-                        }
-                    }
-                    //Application closed all windows
-                    if(allWindowsClosed) quit = true;
                 }
+                while (SDL_PollEvent(&e) != 0 && startDuel) {
+                    //if (e.type == SDL_QUIT) quit = true;
+                    duel d(cards);
+                    startDuel = false;
+                }
+                //Check all windows
+                bool allWindowsClosed = true;
+                for (auto &window : windows) {
+                    if(window.isShown() ) {
+                        allWindowsClosed = false;
+                        break;
+                    }
+                }
+                //Application closed all windows
+                if(allWindowsClosed) quit = true;
             }
         }
     }
