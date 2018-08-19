@@ -66,7 +66,7 @@ bool LTexture::loadFromFile(const string &path) {
         SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
         //Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface(windows->renderer, loadedSurface);
-        if(newTexture == nullptr) SDL_Log("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+        if(newTexture == nullptr) SDL_Error_Logger("createTextureFromSurface");
         else {
             //Get image dimensions
             mWidth = loadedSurface->w;
@@ -101,7 +101,7 @@ void LTexture::setBlendMode( SDL_BlendMode blending ) { SDL_SetTextureBlendMode(
 void LTexture::setAlpha( Uint8 alpha ) { SDL_SetTextureAlphaMod( mTexture, alpha );
 }
 
-void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
+void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x, y, mWidth, mHeight };
     //Set clip rendering dimensions
