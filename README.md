@@ -1,4 +1,4 @@
 # Blade
 Blade II card game from the Trails series.
-This was made using C++ and SDL2 framework via the CLion IDE. 
-Some SDL2 code was taken from lazyfoo's tutorials.
+This was made using C++ via the CLion IDE.
+SDL2 graphical rendition in progress.
