@@ -1,5 +1,5 @@
 //
-// Created by PC on 7/3/2018.
+// Created by Michael Trinh
 //
 
 #ifndef BLADE_HAND_H
@@ -29,11 +29,10 @@ public:
     void setRegularCards(unsigned int);
     void setSpecialCards(unsigned int);
     void createHand(stack<card>&);
-    void printHand() const;
+    string printHand();
+    string printHidden();
     void shuffleHand();
     void sortHand();
-    void setTop();
-    void setBot();
 };
 
 hand::hand() {
@@ -48,12 +47,18 @@ unsigned int hand::getRegularCards() const { return regularCards; } // end getRe
 unsigned int hand::getSpecialCards() const { return specialCards; } // end getSpecialCards
 
 // output hand
-void hand::printHand() const {
-    cout << "Regular Cards: " << getRegularCards() << '\t';
-    cout << "Special Cards: " << getSpecialCards() << endl;
-    for (auto &i : hand_) cout << i.getName() << " ";
-    cout << endl;
+string hand::printHand() {
+    string output;
+    for (auto &card : hand_) output += "[" + card.getName() + "] ";
+    return output;
 } // end printHand
+
+// output hidden version of hand
+string hand::printHidden() {
+    string output;
+    for (auto &card : hand_) output += "[?] ";
+    return output;
+} // end printHidden
 
 void hand::setRegularCards(unsigned int regCards){ regularCards = regCards; } // end setRegularCards
 
@@ -97,25 +102,4 @@ void hand::sortHand() {
     hand_.swap(*regHand);
 } // end sortHand
 
-// top side of hand
-void hand::setTop() {
-    //use an offset to determine card position in hand
-    unsigned int cardOffset = 0;
-    //set position for each card in hand
-    for(unsigned int i = 0; i < TOTAL_CARDS/2; i++) {
-        hand_.at(i).setPosition(20+cardOffset,20+cardOffset);
-        cardOffset+=CARD_WIDTH+10;
-    }
-}
-
-// bot side of hand
-void hand::setBot() {
-    //use an offset to determine card position in hand
-    unsigned int cardOffset = 0;
-    //set position for each card in hand
-    for(unsigned int i = 0; i < TOTAL_CARDS/2; i++) {
-        hand_.at(i).setPosition(SCREEN_WIDTH+20+cardOffset,SCREEN_HEIGHT-20+cardOffset);
-        cardOffset+=CARD_WIDTH+10;
-    }
-}
 #endif //BLADE_HAND_H
