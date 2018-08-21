@@ -93,7 +93,7 @@ bool sortByName(const card &lhs, const card &rhs) { return lhs.getName() < rhs.g
 
 // give 10 cards to both hands from the shared deck at start of duel
 void hand::createHand(stack<card> &deck) {
-    card temp;
+    card temp = deck.top();
     for(int i = 0; i < START_HAND_QUANTITY; i++) {
         temp = deck.top();
         if (isRegularCard(temp)) setRegularCards(1+getRegularCards());
