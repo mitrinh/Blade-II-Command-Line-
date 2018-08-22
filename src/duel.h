@@ -74,8 +74,8 @@ bool isBolted(const field &field__) { return (field__.field_.back().getBolted())
 bool isForce(const card &card_) { return card_.getCardType() == 4; }
 
 // check if a string is a number
-bool is_number(const std::string& s) {
-    return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+bool is_number(const string& s) {
+    return !s.empty() && find_if(s.begin(),s.end(), [](char c) { return !isdigit(c); }) == s.end();
 }
 
 // constructor
@@ -127,11 +127,12 @@ duel::~duel() = default; // end destructor
 // play a card from the respective player's hand
 void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyField, unsigned int position) {
     // create pointer to card that is played
-    unique_ptr<card> temp(&hand__.hand_.at(position));
+    /*unique_ptr<card> temp(&hand__.hand_.at(position));*/
+	card temp = hand__.hand_.at(position);
     // put the card on the field if it has a value > 2 or if it is a '1' card and pile isn't bolted is or if it is force
-    if( (temp->getValue() > 2 || (temp->getName()=="1" && !isBolted(field__)))
-    || (isForce(*temp))) field__.field_.emplace_back(*temp);
-    switch (temp->getCardType()) {
+    if( (temp.getValue() > 2 || (temp.getName()=="1" && !isBolted(field__)))
+    || (isForce(temp))) field__.field_.emplace_back(temp);
+    switch (temp.getCardType()) {
         // bolt, nullify a cards value/effect
         case 1:
             enemyField.field_.back().setBolted(true);
@@ -161,18 +162,18 @@ void duel::playCard(hand &hand__, hand &enemyHand, field &field__, field &enemyF
         // regular card
         default:
             // if card played is '1' and top card on field is bolted, unbolt it
-            if(temp->getName()=="1" && isBolted(field__)) {
+            if(temp.getName()=="1" && isBolted(field__)) {
                 field__.field_.back().setBolted(false);
                 // if bolted card was force, double pile; else add the bolted card's value back to pile
                 if(isForce(field__.field_.back())) field__.setPile(field__.getPile() * 2);
                 else field__.setPile(field__.getPile() + field__.field_.back().getValue());
             }
             // add value to pile when above condition is false
-            else field__.setPile(field__.getPile() + temp->getValue());
+            else field__.setPile(field__.getPile() + temp.getValue());
             break;
     }
     // if blast was played, discard blast and play another card
-    if(temp->getCardType() == 3) {
+    if(temp.getCardType() == 3) {
         discardCard(position,hand__);
         cout << "Now play another card." << endl;
         printField();
