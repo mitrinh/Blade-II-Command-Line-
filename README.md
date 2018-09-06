@@ -1,4 +1,4 @@
 # Blade
-Blade II card game from the Trails series.
-This was made using C++ via the CLion IDE.
-SDL2 graphical rendition in progress.
+The Blade II card game based off "Blade II" in the 'Trails' video games created in C++. 
+Only uses console/command prompt only. 
+Currently being ported to JavaScript/Node.js for use in discord.
