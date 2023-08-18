@@ -1,4 +1,4 @@
-# Blade
-2 player card game based off "Blade II" from a video game franchise. 
+# Blade II
+2 player card game based off of Blade II. 
 Created in C++ for command line. 
-Currently being ported to Node.js to be used as a Discord bot.
+Planned to be ported to Node.js to be used as a public Discord bot. 
